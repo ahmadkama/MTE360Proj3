@@ -152,10 +152,72 @@ phases_2
 gain_1
 gain_2
 
+for i= 1:length(freqs)
+    if phases_1(i) > 0
+        phases_1(i) = phases_1(i) - 360;
+    end
+    if phases_2(i) > 0
+        phases_2(i) = phases_2(i) - 360;
+    end
+end
+
 sys1 = tf([(1/m_1) (b_2/m_1/m_2) (k/m_1/m_2)], [1 a_1 a_2 a_3])
 sys2 = tf([(k/m_1/m_2)], [1 a_1 a_2 a_3])
 
+w = logspace(-1,3,1000);
+
+[mag, phase, w_out] = bode(sys1);
 figure
-bode(sys1)
+subplot(2,1,1);
+loglog(w_out,squeeze(mag)),grid; hold on; 
+loglog(freqs*2*pi, gain_1);
+ylabel('gain [mm/mm]');
+legend('Theoretical', 'Experimental');
+subplot(2,1,2);
+semilogx(w_out,squeeze(phase)),grid; hold on;
+semilogx(freqs*2*pi,phases_1);
+ylabel('phase [°]');
+xlabel('freq [rad/s]');
+legend('Theoretical', 'Experimental');
+
+[mag, phase, w_out] = bode(sys2);
 figure
-bode(sys2)
+subplot(2,1,1);
+loglog(w_out,squeeze(mag)),grid; hold on; 
+loglog(freqs*2*pi, gain_2);
+ylabel('gain [mm/mm]');
+legend('Theoretical', 'Experimental');
+subplot(2,1,2);
+semilogx(w_out,squeeze(phase)),grid; hold on;
+semilogx(freqs*2*pi,phases_2);
+ylabel('phase [°]');
+xlabel('freq [rad/s]');
+legend('Theoretical', 'Experimental');
+
+%%
+% traj = load('trajectory_data.mat');
+% k_p = 0.05;
+% 
+% 
+% t = traj.t;
+% command = traj.s;
+% 
+% open('Copy_of_flexible_drive.mdl');
+% sim('Copy_of_flexible_drive.mdl');
+% 
+% data = load('exp_data_2_1_kp_005.mat');
+% 
+% figure
+% subplot(3, 1, 1)
+% plot(t, command);
+% ylabel('Position [mm]');
+% subplot(3, 1, 2);
+% plot(tsim, esim); hold on;
+% plot(data.t, data.xr - data.x2);
+% ylabel('Error [mm]');
+% legend('Simulated', 'Experimental');
+% subplot(3, 1, 3);
+% plot(tsim, usim); hold on;
+% plot(data.t, data.u);
+% ylabel('Control [V]');
+% legend('Simulated', 'Experimental');

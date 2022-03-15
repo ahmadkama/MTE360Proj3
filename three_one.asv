@@ -107,55 +107,116 @@ m1 = m_1; m2 = m_2;
 b1 = b_1; b2 = b_2;
 d1 = d_1; d2 = d_2;
 
-t = data1.t;
-u = data1.u;
+% t = data1.t;
+% u = data1.u;
+% 
+% open('flexible_drive.mdl');
+% sim('flexible_drive.mdl');
+% 
+% figure
+% subplot(3, 1, 1)
+% plot(t, u);
+% ylabel('Voltage [V]');
+% subplot(3, 1, 2);
+% plot(t, data1.v1); hold on; plot(t, v1sim(1:8001));
+% ylabel('v1 [mm/s]');
+% legend('experimental', 'simualated');
+% subplot(3, 1, 3);
+% plot(t, data1.v2); hold on; plot(t, v2sim(1:8001));
+% ylabel('v2 [mm/s]');
+% legend('experimental', 'simualated');
+%
+% %%
+% 
+% freqs = [0.5, 1, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 8.0, 12.0, 16.0, 20.0];
+% 
+% phases_1 = zeros(14,1);
+% phases_2 = zeros(14,1);
+% gain_1 = zeros(14,1);
+% gain_2 = zeros(14,1);
+% 
+% for i = 1:length(freqs)
+%     freq = freqs(i);
+%     data = load(strcat('velocity_response_freq_', num2str(freq*10), '.mat'));
+%     [amp_1, phase_rad_1] = fit_sine_wave(data.t, data.v1, freq*2*pi);
+%     [amp_2, phase_rad_2] = fit_sine_wave(data.t, data.v2, freq*2*pi);
+% 
+%     gain_1(i) = amp_1 / 2.5;
+%     phases_1(i) = phase_rad_1 * 180 / pi;
+%     gain_2(i) = amp_2 / 2.5;
+%     phases_2(i) = phase_rad_2 * 180 / pi;
+% end
+% 
+% phases_1
+% phases_2
+% gain_1
+% gain_2
+% 
+% for i= 1:length(freqs)
+%     if phases_1(i) > 0
+%         phases_1(i) = phases_1(i) - 360;
+%     end
+%     if phases_2(i) > 0
+%         phases_2(i) = phases_2(i) - 360;
+%     end
+% end
+% 
+% sys1 = tf([(1/m_1) (b_2/m_1/m_2) (k/m_1/m_2)], [1 a_1 a_2 a_3])
+% sys2 = tf([(k/m_1/m_2)], [1 a_1 a_2 a_3])
+% 
+% w = logspace(-1,3,1000);
+% 
+% [mag, phase, w_out] = bode(sys1);
+% figure
+% subplot(2,1,1);
+% loglog(w_out,squeeze(mag)),grid; hold on; 
+% loglog(freqs*2*pi, gain_1);
+% ylabel('gain [mm/mm]');
+% legend('Theoretical', 'Experimental');
+% subplot(2,1,2);
+% semilogx(w_out,squeeze(phase)),grid; hold on;
+% semilogx(freqs*2*pi,phases_1);
+% ylabel('phase [°]');
+% xlabel('freq [rad/s]');
+% legend('Theoretical', 'Experimental');
+% 
+% [mag, phase, w_out] = bode(sys2);
+% figure
+% subplot(2,1,1);
+% loglog(w_out,squeeze(mag)),grid; hold on; 
+% loglog(freqs*2*pi, gain_2);
+% ylabel('gain [mm/mm]');
+% legend('Theoretical', 'Experimental');
+% subplot(2,1,2);
+% semilogx(w_out,squeeze(phase)),grid; hold on;
+% semilogx(freqs*2*pi,phases_2);
+% ylabel('phase [°]');
+% xlabel('freq [rad/s]');
+% legend('Theoretical', 'Experimental');
 
-open('flexible_drive.mdl');
-sim('flexible_drive.mdl');
+%%
+traj = load('trajectory_data.mat');
+k_p = 0.05;
+
+
+t = traj.t;
+command = traj.s;
+
+open('Copy_of_flexible_drive.mdl');
+sim('Copy_of_flexible_drive.mdl');
+
+data = load('exp_data_2_1_kp_005.mat');
 
 figure
 subplot(3, 1, 1)
-plot(t, u);
-ylabel('Voltage [V]');
+plot(t, command);
+ylabel('Position [mm]');
 subplot(3, 1, 2);
-plot(t, data1.v1); hold on; plot(t, v1sim(1:8001));
-ylabel('v1 [mm/s]');
-legend('experimental', 'simualated');
+plot(tsim, esim); hold on;
+plot(data.t, data.e);
+ylabel('Error [mm]');
+legend('Simulated', 'Experimental');
 subplot(3, 1, 3);
-plot(t, data1.v2); hold on; plot(t, v2sim(1:8001));
+plot(tsim, usim); hold on;
+
 ylabel('v2 [mm/s]');
-legend('experimental', 'simualated');
-
-%%
-
-freqs = [0.5, 1, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 8.0, 12.0, 16.0, 20.0];
-
-phases_1 = zeros(14,1);
-phases_2 = zeros(14,1);
-gain_1 = zeros(14,1);
-gain_2 = zeros(14,1);
-
-for i = 1:length(freqs)
-    freq = freqs(i);
-    data = load(strcat('velocity_response_freq_', num2str(freq*10), '.mat'));
-    [amp_1, phase_rad_1] = fit_sine_wave(data.t, data.v1, freq*2*pi);
-    [amp_2, phase_rad_2] = fit_sine_wave(data.t, data.v2, freq*2*pi);
-
-    gain_1(i) = amp_1 / 2.5;
-    phases_1(i) = phase_rad_1 * 180 / pi;
-    gain_2(i) = amp_2 / 2.5;
-    phases_2(i) = phase_rad_2 * 180 / pi;
-end
-
-phases_1
-phases_2
-gain_1
-gain_2
-
-sys1 = tf([(1/m_1) (b_2/m_1/m_2) (k/m_1/m_2)], [1 a_1 a_2 a_3])
-sys2 = tf([(k/m_1/m_2)], [1 a_1 a_2 a_3])
-
-figure
-bode(sys1)
-figure
-bode(sys2)
