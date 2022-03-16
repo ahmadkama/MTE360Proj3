@@ -126,98 +126,185 @@ plot(t, data1.v2); hold on; plot(t, v2sim(1:8001));
 ylabel('v2 [mm/s]');
 legend('experimental', 'simualated');
 
-%%
-
-freqs = [0.5, 1, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 8.0, 12.0, 16.0, 20.0];
-
-phases_1 = zeros(14,1);
-phases_2 = zeros(14,1);
-gain_1 = zeros(14,1);
-gain_2 = zeros(14,1);
-
-for i = 1:length(freqs)
-    freq = freqs(i);
-    data = load(strcat('velocity_response_freq_', num2str(freq*10), '.mat'));
-    [amp_1, phase_rad_1] = fit_sine_wave(data.t, data.v1, freq*2*pi);
-    [amp_2, phase_rad_2] = fit_sine_wave(data.t, data.v2, freq*2*pi);
-
-    gain_1(i) = amp_1 / 2.5;
-    phases_1(i) = phase_rad_1 * 180 / pi;
-    gain_2(i) = amp_2 / 2.5;
-    phases_2(i) = phase_rad_2 * 180 / pi;
-end
-
-phases_1
-phases_2
-gain_1
-gain_2
-
-for i= 1:length(freqs)
-    if phases_1(i) > 0
-        phases_1(i) = phases_1(i) - 360;
-    end
-    if phases_2(i) > 0
-        phases_2(i) = phases_2(i) - 360;
-    end
-end
-
-sys1 = tf([(1/m_1) (b_2/m_1/m_2) (k/m_1/m_2)], [1 a_1 a_2 a_3])
-sys2 = tf([(k/m_1/m_2)], [1 a_1 a_2 a_3])
-
-w = logspace(-1,3,1000);
-
-[mag, phase, w_out] = bode(sys1);
-figure
-subplot(2,1,1);
-loglog(w_out,squeeze(mag)),grid; hold on; 
-loglog(freqs*2*pi, gain_1);
-ylabel('gain [mm/mm]');
-legend('Theoretical', 'Experimental');
-subplot(2,1,2);
-semilogx(w_out,squeeze(phase)),grid; hold on;
-semilogx(freqs*2*pi,phases_1);
-ylabel('phase [°]');
-xlabel('freq [rad/s]');
-legend('Theoretical', 'Experimental');
-
-[mag, phase, w_out] = bode(sys2);
-figure
-subplot(2,1,1);
-loglog(w_out,squeeze(mag)),grid; hold on; 
-loglog(freqs*2*pi, gain_2);
-ylabel('gain [mm/mm]');
-legend('Theoretical', 'Experimental');
-subplot(2,1,2);
-semilogx(w_out,squeeze(phase)),grid; hold on;
-semilogx(freqs*2*pi,phases_2);
-ylabel('phase [°]');
-xlabel('freq [rad/s]');
-legend('Theoretical', 'Experimental');
-
-%%
-% traj = load('trajectory_data.mat');
-% k_p = 0.05;
+% %%
 % 
+% freqs = [0.5, 1, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 8.0, 12.0, 16.0, 20.0];
 % 
-% t = traj.t;
-% command = traj.s;
+% phases_1 = zeros(14,1);
+% phases_2 = zeros(14,1);
+% gain_1 = zeros(14,1);
+% gain_2 = zeros(14,1);
 % 
-% open('Copy_of_flexible_drive.mdl');
-% sim('Copy_of_flexible_drive.mdl');
+% for i = 1:length(freqs)
+%     freq = freqs(i);
+%     data = load(strcat('velocity_response_freq_', num2str(freq*10), '.mat'));
+%     [amp_1, phase_rad_1] = fit_sine_wave(data.t, data.v1, freq*2*pi);
+%     [amp_2, phase_rad_2] = fit_sine_wave(data.t, data.v2, freq*2*pi);
 % 
-% data = load('exp_data_2_1_kp_005.mat');
+%     gain_1(i) = amp_1 / 2.5;
+%     phases_1(i) = phase_rad_1 * 180 / pi;
+%     gain_2(i) = amp_2 / 2.5;
+%     phases_2(i) = phase_rad_2 * 180 / pi;
+% end
 % 
+% phases_1
+% phases_2
+% gain_1
+% gain_2
+% 
+% for i= 1:length(freqs)
+%     if phases_1(i) > 0
+%         phases_1(i) = phases_1(i) - 360;
+%     end
+%     if phases_2(i) > 0
+%         phases_2(i) = phases_2(i) - 360;
+%     end
+% end
+% 
+% sys1 = tf([(1/m_1) (b_2/m_1/m_2) (k/m_1/m_2)], [1 a_1 a_2 a_3])
+% sys2 = tf([(k/m_1/m_2)], [1 a_1 a_2 a_3])
+% 
+% w = logspace(-1,3,1000);
+% 
+% [mag, phase, w_out] = bode(sys1);
 % figure
-% subplot(3, 1, 1)
-% plot(t, command);
-% ylabel('Position [mm]');
-% subplot(3, 1, 2);
-% plot(tsim, esim); hold on;
-% plot(data.t, data.xr - data.x2);
-% ylabel('Error [mm]');
-% legend('Simulated', 'Experimental');
-% subplot(3, 1, 3);
-% plot(tsim, usim); hold on;
-% plot(data.t, data.u);
-% ylabel('Control [V]');
-% legend('Simulated', 'Experimental');
+% subplot(2,1,1);
+% loglog(w_out,squeeze(mag)),grid; hold on; 
+% loglog(freqs*2*pi, gain_1);
+% ylabel('gain [mm/mm]');
+% legend('Theoretical', 'Experimental');
+% subplot(2,1,2);
+% semilogx(w_out,squeeze(phase)),grid; hold on;
+% semilogx(freqs*2*pi,phases_1);
+% ylabel('phase [°]');
+% xlabel('freq [rad/s]');
+% legend('Theoretical', 'Experimental');
+% 
+% [mag, phase, w_out] = bode(sys2);
+% figure
+% subplot(2,1,1);
+% loglog(w_out,squeeze(mag)),grid; hold on; 
+% loglog(freqs*2*pi, gain_2);
+% ylabel('gain [mm/mm]');
+% legend('Theoretical', 'Experimental');
+% subplot(2,1,2);
+% semilogx(w_out,squeeze(phase)),grid; hold on;
+% semilogx(freqs*2*pi,phases_2);
+% ylabel('phase [°]');
+% xlabel('freq [rad/s]');
+% legend('Theoretical', 'Experimental');
+
+%%
+traj = load('trajectory_data.mat');
+t = 0:0.001:4;
+t = t';
+
+command = repmat(traj.s, 1, 2);
+command = command(1:4001)';
+
+data = load('exp_data_2_1_kp_005.mat');
+error = data.xr - data.x2;
+
+%% 3.4 a)
+k_p = 0.05;
+open('flexible_drive_q34.mdl');
+sim('flexible_drive_q34.mdl');
+
+
+figure
+subplot(3, 1, 1)
+plot(t, command(1:4001));
+ylabel('Command [mm]');
+subplot(3, 1, 2);
+plot(tsim, esim); hold on;
+plot(t, error);
+ylabel('Error [mm]');
+legend('Simulated', 'Experimental');
+subplot(3, 1, 3);
+plot(tsim, usim); hold on;
+plot(t, data.u);
+ylabel('Control [V]');
+legend('Simulated', 'Experimental');
+
+k_p = 0.07;
+open('flexible_drive_q34.mdl');
+sim('flexible_drive_q34.mdl');
+
+
+figure
+subplot(3, 1, 1)
+plot(t, command(1:4001));
+ylabel('Command [mm]');
+subplot(3, 1, 2);
+plot(tsim, esim); hold on;
+plot(t, error);
+ylabel('Error [mm]');
+legend('Simulated', 'Experimental');
+subplot(3, 1, 3);
+plot(tsim, usim); hold on;
+plot(t, data.u);
+ylabel('Control [V]');
+legend('Simulated', 'Experimental');
+
+%% 3.4 b)
+
+k_p = 0.18;
+open('flexible_drive_q34.mdl');
+sim('flexible_drive_q34.mdl');
+
+
+figure
+subplot(3, 1, 1)
+plot(t, command(1:4001));
+ylabel('Command [mm]');
+subplot(3, 1, 2);
+plot(tsim, esim); hold on;
+plot(t, error);
+ylabel('Error [mm]');
+legend('Simulated', 'Experimental');
+subplot(3, 1, 3);
+plot(tsim, usim); hold on;
+plot(t, data.u);
+ylabel('Control [V]');
+legend('Simulated', 'Experimental');
+
+%% 3.4 c)
+k_p = 0.19;
+open('flexible_drive_q34.mdl');
+sim('flexible_drive_q34.mdl');
+
+
+figure
+subplot(3, 1, 1)
+plot(t, command(1:4001));
+ylabel('Command [mm]');
+subplot(3, 1, 2);
+plot(tsim, esim); hold on;
+plot(t, error);
+ylabel('Error [mm]');
+legend('Simulated', 'Experimental');
+subplot(3, 1, 3);
+plot(tsim, usim); hold on;
+plot(t, data.u);
+ylabel('Control [V]');
+legend('Simulated', 'Experimental');
+
+%% 3.4 d)
+open('flexible_drive_q34_collocated.mdl');
+sim('flexible_drive_q34_collocated.mdl');
+
+
+figure
+subplot(3, 1, 1)
+plot(t, command(1:4001));
+ylabel('Command [mm]');
+subplot(3, 1, 2);
+plot(tsim, esim); hold on;
+plot(t, error);
+ylabel('Error [mm]');
+legend('Simulated', 'Experimental');
+subplot(3, 1, 3);
+plot(tsim, usim); hold on;
+plot(t, data.u);
+ylabel('Control [V]');
+legend('Simulated', 'Experimental');
